@@ -1,8 +1,8 @@
-from application.database import Base
 from flask_security import UserMixin, RoleMixin
+from sqlalchemy import Boolean, DateTime, Column, Integer, String, ForeignKey, UnicodeText, Float
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy import Boolean, DateTime, Column, Integer, ARRAY, \
-    String, ForeignKey, UnicodeText, Float
+
+from application.database import Base
 
 
 class RolesUsers(Base):
@@ -52,11 +52,12 @@ class Show(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
     rating = Column(Integer)
+    image_url = Column(String(255), nullable=True)
+    image_sqr = Column(String(255), nullable=True)
     tags = Column(String(255), nullable=True)
     ticket_price = Column(Float())
     format = Column(String(255), nullable=False)
     language = Column(String(255), nullable=False)
-
 
 
 class Running(Base):

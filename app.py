@@ -1,11 +1,16 @@
 import os
 
-from flask import Flask, render_template_string, render_template
-from flask_restful import Resource, Api
-
+from flask import Flask, render_template_string
+from flask_cors import CORS
+from flask_restful import Api
 from flask_security import Security, current_user, auth_required, hash_password, \
     SQLAlchemySessionUserDatastore
 
+from api.booking_api import BookingsAPI
+from api.review_api import ReviewsAPI
+from api.running_api import RunningAPI
+from api.show_api import ShowsAPI
+from api.theater_api import TheatresAPI
 from application.config import LocalDevelopmentConfig
 from application.database import db_session, init_db
 from application.models import User, Role
@@ -25,6 +30,9 @@ app.logger.info("App setup complete")
 # Setup Flask-Security
 user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
 app.security = Security(app, user_datastore)
+api = Api(app)
+CORS(app)
+app.app_context().push()
 
 # one time setup
 with app.app_context():
@@ -33,8 +41,13 @@ with app.app_context():
     if not app.security.datastore.find_user(email="test3@me.com"):
         app.security.datastore.create_user(email="test3@me.com", password=hash_password("password3"))
     db_session.commit()
-api = Api(app)
-app.app_context().push()
+
+# APIs for the application
+api.add_resource(ShowsAPI, "/api/shows")
+api.add_resource(TheatresAPI, "/api/theatre")
+api.add_resource(ReviewsAPI, "/api/reviews")
+api.add_resource(BookingsAPI, "/api/bookings")
+api.add_resource(RunningAPI, "/api/running")
 
 
 # Import all the controllers, so they are loaded

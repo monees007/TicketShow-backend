@@ -1,0 +1,1151 @@
+openapi: 3.0.3
+info:
+  title: TicketShow - OpenAPI 3.0
+  description: |-
+    This is a sample Pet Store Server based on the OpenAPI 3.0 specification.  You can find out more about
+    Swagger at [https://swagger.io](https://swagger.io). In the third iteration of the pet store, we've switched to the design first approach!
+    You can now help us improve the API whether it's by making changes to the definition itself or to the code.
+    That way, with time, we can improve the API in general, and expose some of the new features in OAS3.
+
+    _If you're looking for the Swagger 2.0/OAS 2.0 version of Petstore, then click [here](https://editor.swagger.io/?url=https://petstore.swagger.io/v2/swagger.yaml). Alternatively, you can load via the `Edit > Load Petstore OAS 2.0` menu option!_
+    
+    Some useful links:
+    - [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)
+    - [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://127.0.0.1:4433
+tags:
+  - name: show
+    description: Operations about Shows
+    externalDocs:
+      description: Find out more
+      url: http://swagger.io
+  - name: theatre
+    description: Operations about Theatres
+    externalDocs:
+      description: Find out more about our store
+      url: http://swagger.io
+  - name: user
+    description: Operations about user
+paths:
+  /api/shows:
+    get:
+      tags:
+        - show
+      summary: Get an existing show
+      description: Get an existing show by Id.
+      operationId: getShow
+      parameters:
+        - name: id
+          in: query
+          description: Id values that need to be considered for filter
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Show'
+    delete:
+      tags:
+        - show
+      summary: Delete an existing show
+      description: Get an existing show by Id.
+      operationId: deleteShow
+      parameters:
+        - name: id
+          in: query
+          description: Id values that need to be considered for filter
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+
+
+    put:
+      tags:
+        - show
+      summary: Update an existing show
+      description: Update an existing show by Id
+      operationId: updateshow
+      requestBody:
+        $ref: '#/components/requestBodies/Show'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Show'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Show'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: show not found
+        '405':
+          description: Validation exception
+
+    post:
+      tags:
+        - show
+      summary: Add a new show to the database
+      description: Add a new show to the database
+      operationId: addShow
+      requestBody:
+        description: Create a new show in the database
+        content:
+          application/json:
+            schema:
+              required:
+                - name
+              type: object
+              properties:
+                name:
+                  type: string
+                rating:
+                  type: number
+                image_url:
+                  type: string
+                image_sqr:
+                  type: string
+                tags:
+                  type: string
+                ticket_price:
+                  type: number
+                format:
+                  type: string
+                language:
+                  type: string
+
+        required: false
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Show'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Show'
+        '405':
+          description: Invalid input
+
+  /api/running:
+    get:
+      tags:
+        - running
+      summary: Get an existing running show
+      description: Get an existing running show by Id.
+      operationId: getRunning
+      parameters:
+        - name: id
+          in: query
+          description: Id values that need to be considered for filter
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Running'
+    delete:
+      tags:
+        - running
+      summary: Delete an existing running show
+      description: Delete an existing running show by Id.
+      operationId: deleteRunningShow
+      parameters:
+        - name: id
+          in: query
+          description: Id values that need to be considered for filter
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+
+
+    put:
+      tags:
+        - running
+      summary: Update an existing running show
+      description: Update an existing running show
+      operationId: updateRunningShow
+      requestBody:
+        $ref: '#/components/requestBodies/Running_i'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Running'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Running'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Running not found
+        '405':
+          description: Validation exception
+
+    post:
+      tags:
+        - running
+      summary: Add a new show to the database
+      description: Add a new show to the database
+      operationId: UpdateShow
+      requestBody:
+        $ref: '#/components/requestBodies/Running'
+
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Running'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Running'
+        '405':
+          description: Invalid input
+
+  /api/booking:
+    get:
+      tags:
+        - booking
+      summary: Get an existing booking
+      description: Get an existing booking by Id.
+      operationId: getBooking
+      parameters:
+        - name: id
+          in: query
+          description: Id values that need to be considered for filter
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+    delete:
+      tags:
+        - booking
+      summary: Get an existing booking
+      description: Get an existing booking by Id.
+      operationId: deleteBooking
+      parameters:
+        - name: id
+          in: query
+          description: Id values that need to be considered for filter
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+
+
+    put:
+      tags:
+        - booking
+      summary: Update an existing booking
+      description: Update an existing booking by Id
+      operationId: updatebooking
+      requestBody:
+        $ref: '#/components/requestBodies/Booking_i'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: booking not found
+        '405':
+          description: Validation exception
+
+    post:
+      tags:
+        - booking
+      summary: Add a new booking to the database
+      description: Add a new booking to the database
+      operationId: addBooking
+      requestBody:
+        $ref: '#/components/requestBodies/Booking'
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '405':
+          description: Invalid input
+
+  /api/review:
+    get:
+      tags:
+        - review
+      summary: Get an existing review
+      description: Get an existing review by Id.
+      operationId: getReview
+      parameters:
+        - name: id
+          in: query
+          description: Id values that need to be considered for filter
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+    delete:
+      tags:
+        - review
+      summary: Get an existing review
+      description: Get an existing review by Id.
+      operationId: deleteReview
+      parameters:
+        - name: id
+          in: query
+          description: Id values that need to be considered for filter
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+
+
+    put:
+      tags:
+        - review
+      summary: Update an existing review
+      description: Update an existing review by Id
+      operationId: updatereview
+      requestBody:
+        $ref: '#/components/requestBodies/Review_i'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: review not found
+        '405':
+          description: Validation exception
+
+    post:
+      tags:
+        - review
+      summary: Add a new review to the database
+      description: Add a new review to the database
+      operationId: addReview
+      requestBody:
+        $ref: '#/components/requestBodies/Review'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '405':
+          description: Invalid input
+
+  /api/theatre:
+    get:
+      tags:
+        - theatre
+      summary: Get an existing theatre
+      description: Get an existing theatre by Id.
+      operationId: getTheatre
+      parameters:
+        - name: id
+          in: query
+          description: Id values that need to be considered for filter
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Theatre'
+    delete:
+      tags:
+        - theatre
+      summary: Get an existing theatre
+      description: Get an existing theatre by Id.
+      operationId: deletetheatre
+      parameters:
+        - name: id
+          in: query
+          description: Id values that need to be considered for filter
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+
+
+    put:
+      tags:
+        - theatre
+      summary: Update an existing theatre
+      description: Update an existing theatre by Id
+      operationId: updatetheatre
+      requestBody:
+        $ref: '#/components/requestBodies/Theatre_i'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Theatre'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Theatre'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: theatre not found
+        '405':
+          description: Validation exception
+
+    post:
+      tags:
+        - theatre
+      summary: Add a new theatre to the database
+      description: Add a new theatre to the database
+      operationId: addtheatre
+      requestBody:
+        $ref: '#/components/requestBodies/Theatre'
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Theatre'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Theatre'
+        '405':
+          description: Invalid input
+
+
+  /user:
+    post:
+      tags:
+        - user
+      summary: Create user
+      description: This can only be done by the logged in user.
+      operationId: createUser
+      requestBody:
+        description: Created user object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+  /user/createWithList:
+    post:
+      tags:
+        - user
+      summary: Creates list of users with given input array
+      description: Creates list of users with given input array
+      operationId: createUsersWithListInput
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+        default:
+          description: successful operation
+  /login:
+    post:
+      summary: Login to application
+      description: Supports both json and form request types. If the caller is already logged in, then in the form case, they are redirected to SECURITY_POST_LOGIN_VIEW, for a json request, a 400 is returned.
+      parameters:
+        - name: next
+          in: query
+          description: >
+            URL to redirect to on successful login. Ignored for json request.
+          schema:
+            type: string
+        - $ref: "#/components/parameters/include_auth_token"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        200:
+          description: Login response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginJsonResponse"
+            text/html:
+              schema:
+                description: Unsuccessful login
+                type: string
+                example: render_template(SECURITY_LOGIN_USER_TEMPLATE) with error values
+        302:
+          description: >
+            If the caller already authenticated, the form contents is ignored and a
+            redirect is done: redirect(next) or redirect(SECURITY_POST_LOGIN_VIEW).
+
+            If the caller is NOT already authenticated, and the form contents are
+            validated the caller will be redirected to:
+            redirect(next) or redirect(SECURITY_POST_LOGIN_VIEW)
+          headers:
+            Location:
+              description: Redirect to ``SECURITY_POST_LOGIN_VIEW``
+              schema:
+                type: string
+        400:
+          description: Errors while validating login, or caller already authenticated/logged in.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DefaultJsonErrorResponse"
+  /user/logout:
+    get:
+      tags:
+        - user
+      summary: Logs out current logged in user session
+      description: ''
+      operationId: logoutUser
+      parameters: [ ]
+      responses:
+        default:
+          description: successful operation
+  /user/{username}:
+    get:
+      tags:
+        - user
+      summary: Get user by user name
+      description: ''
+      operationId: getUserByName
+      parameters:
+        - name: username
+          in: path
+          description: 'The name that needs to be fetched. Use user1 for testing. '
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+    put:
+      tags:
+        - user
+      summary: Update user
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      parameters:
+        - name: username
+          in: path
+          description: name that need to be deleted
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent user in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        default:
+          description: successful operation
+    delete:
+      tags:
+        - user
+      summary: Delete user
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      parameters:
+        - name: username
+          in: path
+          description: The name that needs to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+components:
+  parameters:
+    include_auth_token:
+      name: include_auth_token
+      description: If set/sent, will return an Authentication Token for user
+      in: query
+      schema:
+        type: string
+  schemas:
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+          example: 437 Lytton
+        city:
+          type: string
+          example: Palo Alto
+        state:
+          type: string
+          example: CA
+        zip:
+          type: string
+          example: '94301'
+      xml:
+        name: address
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        username:
+          type: string
+          example: theUser
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: James
+        email:
+          type: string
+          example: john@email.com
+        password:
+          type: string
+          example: '12345'
+        phone:
+          type: string
+          example: '12345'
+        userStatus:
+          type: integer
+          description: User Status
+          format: int32
+          example: 1
+      xml:
+        name: user
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        show_id:
+          type: integer
+          format: int64
+        rating:
+          type: number
+        review:
+          type: string
+      xml:
+        name: review
+    Running:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        show_id:
+          type: integer
+          format: int64
+        theatre_id:
+          type: integer
+          format: int64
+        date:
+          type: string
+          format: date-time
+      xml:
+        name: running
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        running_id:
+          type: integer
+          format: int64
+        seats:
+          type: string
+        total_price:
+          type: number
+
+      xml:
+        name: booking
+    Show:
+      required:
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        rating:
+          type: number
+        image_url:
+          type: string
+        image_sqr:
+          type: string
+        tags:
+          type: string
+        ticket_price:
+          type: number
+        format:
+          type: string
+        language:
+          type: string
+      xml:
+        name: show
+    Theatre:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        place:
+          type: string
+        capacity:
+          type: number
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+      xml:
+        name: '##default'
+    LoginJsonResponse:
+      type: object
+      description: >
+        The user successfully signed in. Note that depending on SECURITY_TWO_FACTOR configuration variables, a second form of authentication might be required.
+        Note that if 2FA is not configured, none of the ``tf_`` properties will be returned.
+      required: [ meta, response ]
+      properties:
+        meta:
+          type: object
+          required: [ code ]
+          properties:
+            code:
+              type: integer
+              example: 200
+              description: Http status code
+        response:
+          type: object
+          properties:
+            authentication_token:
+              type: string
+              description: >
+                Token to be used in future token-based API calls. Only returned if "include_auth_token" parameter is set.
+            tf_required:
+              type: boolean
+              description: If two-factor authentication is required for caller.
+            tf_state:
+              type: string
+              description: if "setup_from_login" then the caller must go through two-factor setup endpoint. If "ready" then a code has been sent and should be supplied to SECURITY_TWO_FACTOR_TOKEN_VALIDATION_URL.
+            tf_method:
+              type: string
+              description: Which method was used to send code.
+              example: "webauthn"
+            tf_select:
+              type: boolean
+              description: <
+                If user has setup multiple forms of two-factor authentication, this will be True
+                and the application should prompt the user for which method they want to use.
+            tf_setup_methods:
+              type: array
+              items:
+                type: string
+                description: If user has setup multiple forms of two-factor authentication they are listed
+    Login:
+      type: object
+      required: [ email, password ]
+      properties:
+        email:
+          type: string
+          description: user email
+        password:
+          type: string
+          description: Password
+        remember:
+          type: boolean
+          description: >
+            If true, will remember userid as part of cookie. There is a configuration variable DEFAULT_REMEMBER_ME that can be set. This field will override that.
+        tf_validity_token:
+          type: string
+          description: Code verifying the user has successfully verified 2FA in the past. If verified, the user is able to skip validation of the second factor. Only used when SECURITY_TWO_FACTOR_ALWAYS_VALIDATE is False.
+
+
+    DefaultJsonErrorResponse:
+      type: object
+      properties:
+        response:
+          type: object
+          required: [ errors ]
+          description: >
+            For form validation errors, the 'field_errors' key will be set with a list of errors per
+            invalid form input field (i.e. a dict of 'field-name': list of error strings).
+            The 'errors' key will be a simple list of both form and non-form related
+            errors (all form errors will also be included here).
+          properties:
+            field_errors:
+              type: object
+              description: >
+                Errors per input/form field
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+                  example: field validation error.
+                  description: Error message (localized)
+            errors:
+              type: array
+              items:
+                type: string
+                example: "Unauthenticated"
+                description: Error message (localized)
+  requestBodies:
+    Show:
+      description: Show object that needs to be added to the store
+      content:
+        application/json:
+          schema:
+            required:
+              - name
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              rating:
+                type: number
+              image_url:
+                type: string
+              image_sqr:
+                type: string
+              tags:
+                type: string
+              ticket_price:
+                type: number
+              format:
+                type: string
+              language:
+                type: string
+    Show_i:
+      description: Show object that needs to be added to the store
+      content:
+        application/json:
+          schema:
+            required:
+              - name
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              rating:
+                type: number
+              image_url:
+                type: string
+              image_sqr:
+                type: string
+              tags:
+                type: string
+              ticket_price:
+                type: number
+              format:
+                type: string
+              language:
+                type: string
+            xml:
+              name: show
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Show'
+    Theatre_i:
+      description: Theatre object post
+      content:
+        application/json:
+          schema:
+            required:
+              - name
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              place:
+                type: string
+              capacity:
+                type: number
+    Theatre:
+      description: Theatre object post
+      content:
+        application/json:
+          schema:
+            required:
+              - name
+            type: object
+            properties:
+              name:
+                type: string
+              place:
+                type: string
+              capacity:
+                type: number
+    Booking:
+      description: booking object post
+      content:
+        application/json:
+          schema:
+            required:
+              - name
+            type: object
+            properties:
+              user_id:
+                type: integer
+              running_id:
+                type: integer
+              seats:
+                type: string
+              total_price:
+                type: number
+
+    Review:
+      description: review object post
+      content:
+        application/json:
+          schema:
+            required:
+              - name
+            type: object
+            properties:
+              user_id:
+                type: integer
+              show_id:
+                type: integer
+              rating:
+                type: number
+              review:
+                type: string
+    Running:
+      description: running object post
+      content:
+        application/json:
+          schema:
+            properties:
+              show_id:
+                type: integer
+              theatre_id:
+                type: integer
+              date:
+                type: string
+    Booking_i:
+      description: booking object post
+      content:
+        application/json:
+          schema:
+            required:
+              - name
+            type: object
+            properties:
+              id:
+                type: integer
+              user_id:
+                type: integer
+              running_id:
+                type: integer
+              seats:
+                type: string
+              total_price:
+                type: number
+
+    Review_i:
+      description: review object post
+      content:
+        application/json:
+          schema:
+            properties:
+              id:
+                type: integer
+              user_id:
+                type: integer
+              show_id:
+                type: integer
+              rating:
+                type: number
+              review:
+                type: string
+    Running_i:
+      description: running object post
+      content:
+        application/json:
+          schema:
+            properties:
+              id:
+                type: integer
+              show_id:
+                type: integer
+              theatre_id:
+                type: integer
+              date:
+                type: string
+    UserArray:
+      description: List of user object
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/User'
+  securitySchemes:
+
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
