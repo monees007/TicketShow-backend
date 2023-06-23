@@ -1,9 +1,9 @@
 import os
 
-from flask import Flask, render_template_string
+from flask import Flask, render_template
 from flask_cors import CORS
 from flask_restful import Api
-from flask_security import Security, current_user, auth_required, hash_password, \
+from flask_security import Security, auth_required, hash_password, \
     SQLAlchemySessionUserDatastore
 
 from api.booking_api import BookingsAPI
@@ -11,9 +11,13 @@ from api.review_api import ReviewsAPI
 from api.running_api import RunningAPI
 from api.show_api import ShowsAPI
 from api.theater_api import TheatresAPI
+from application import swagger_render
 from application.config import LocalDevelopmentConfig
 from application.database import db_session, init_db
 from application.models import User, Role
+
+# render openAPI
+swagger_render.render()
 
 app = Flask(__name__, template_folder="templates")
 if os.getenv('ENV', "development") == "production":
@@ -73,7 +77,7 @@ api.add_resource(RunningAPI, "/api/running")
 @app.route("/")
 @auth_required()
 def home():
-    return render_template_string('Hello {{email}} !', email=current_user.email)
+    return render_template("swagger.html")
 
 
 if __name__ == '__main__':
