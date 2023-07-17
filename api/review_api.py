@@ -9,18 +9,20 @@ def abort_if_review_doesnt_exist(rid):
     try:
         Review.query.filter_by(id=rid).one()
     except NoResultFound as e:
-        abort(404, message="Theatre with ID: {} doesn't exist".format(rid))
+        abort(404, message="Review with ID: {} doesn't exist".format(rid))
 
 
 parser = reqparse.RequestParser()  # for GET, DELETE requests
 parser.add_argument('id', required=True, type=int, location='args')
 
-parser2 = reqparse.RequestParser()  # for POST, PUT  requests
-parser2.add_argument('id', required=False, type=int)
+parser2 = reqparse.RequestParser()  # for POST requests
 parser2.add_argument('user_id', required=True, type=int)
 parser2.add_argument('show_id', required=True, type=int)
 parser2.add_argument('rating', required=True, type=int)
 parser2.add_argument('review', required=True, type=str)
+
+parser3 = parser2.copy()  # for PUT requests
+parser3.add_argument('id', required=True, type=int)
 
 resource_fields = {
     'id': fields.Integer,
@@ -48,12 +50,10 @@ class ReviewsAPI(Resource):
         # // return review id
         args = parser2.parse_args()
         review = Review(
-            name=args['name'],
+            user_id=args['user_id'],
+            show_id=args['show_id'],
             rating=args['rating'],
-            tags=args['tags'],
-            ticket_price=args['ticket_price'],
-            format=args['format'],
-            language=args['language'])
+            review=args['review'])
         db_session.add(review)
         db_session.commit()
         return review
@@ -73,7 +73,7 @@ class ReviewsAPI(Resource):
     def put(self):
         # // update review in database
         # // return review id
-        args = parser2.parse_args()
+        args = parser3.parse_args()
         abort_if_review_doesnt_exist(args['id'])
         review = db_session.query(Review).filter_by(id=args['id'])
         review.update(args)

@@ -9,7 +9,7 @@ def abort_if_booking_doesnt_exist(bid):
     try:
         Booking.query.filter_by(id=bid).one()
     except NoResultFound as e:
-        abort(404, message="Theatre with ID: {} doesn't exist".format(bid))
+        abort(404, message="Booking with ID: {} doesn't exist".format(bid))
 
 
 parser = reqparse.RequestParser()  # for GET, DELETE requests

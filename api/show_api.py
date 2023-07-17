@@ -11,17 +11,22 @@ def abort_if_show_doesnt_exist(sid):
     except NoResultFound as e:
         abort(404, message="Theatre with ID: {} doesn't exist".format(sid))
 
+
 parser = reqparse.RequestParser()  # for GET, DELETE requests
 parser.add_argument('id', required=True, type=int, location='args')
 
 parser2 = reqparse.RequestParser()  # for POST, PUT  requests
-parser2.add_argument('id', required=False, type=int)
-parser2.add_argument('name', required=True, type=str)
+parser2.add_argument('name', required=False, type=str)
 parser2.add_argument('rating', required=False, type=int)
+parser2.add_argument('image_url', required=False, type=str)
+parser2.add_argument('image_sqr', required=False, type=str)
 parser2.add_argument('tags', required=False, type=str)
 parser2.add_argument('ticket_price', required=True, type=float)
 parser2.add_argument('format', required=False, type=str)
 parser2.add_argument('language', required=True, type=str)
+
+parser3 = parser2.copy()
+parser3.add_argument('id', required=True, type=int)
 
 resource_fields = {
     'id': fields.Integer,
@@ -57,6 +62,8 @@ class ShowsAPI(Resource):
         show = Show(
             name=args['name'],
             rating=args['rating'],
+            image_url=args['image_url'],
+            image_sqr=args['image_sqr'],
             tags=args['tags'],
             ticket_price=args['ticket_price'],
             format=args['format'],
@@ -80,7 +87,7 @@ class ShowsAPI(Resource):
     def put(self):
         # // update show in database
         # // return show id
-        args = parser2.parse_args()
+        args = parser3.parse_args()
         abort_if_show_doesnt_exist(args['id'])
         show = db_session.query(Show).filter_by(id=args['id'])
         show.update(args)

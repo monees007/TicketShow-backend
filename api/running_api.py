@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from flask_restful import Resource, reqparse, abort, marshal_with, fields
 from sqlalchemy.exc import NoResultFound
 
@@ -21,7 +19,7 @@ parser2 = reqparse.RequestParser()  # for POST, PUT  requests
 parser2.add_argument('id', required=False, type=int)
 parser2.add_argument('theatre_id', required=True, type=int)
 parser2.add_argument('show_id', required=True, type=int)
-parser2.add_argument('date', required=True, type=datetime)
+parser2.add_argument('date', required=False, type=str)
 
 resource_fields = {
     'id': fields.Integer,

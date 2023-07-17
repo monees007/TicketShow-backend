@@ -1,5 +1,5 @@
 from flask_security import UserMixin, RoleMixin
-from sqlalchemy import Boolean, DateTime, Column, Integer, String, ForeignKey, UnicodeText, Float
+from sqlalchemy import Boolean, DateTime, Column, Integer, String, ForeignKey, UnicodeText, Float, func
 from sqlalchemy.orm import relationship, backref
 
 from application.database import Base
@@ -63,9 +63,9 @@ class Show(Base):
 class Running(Base):
     __tablename__ = "running"
     id = Column(Integer, primary_key=True)
-    theater_id = Column(Integer, ForeignKey("theatre.id"))
+    theatre_id = Column(Integer, ForeignKey("theatre.id"))
     show_id = Column(Integer, ForeignKey("show.id"))
-    date = Column(DateTime())
+    date = Column(DateTime(), server_default=func.now())
 
 
 class Booking(Base):

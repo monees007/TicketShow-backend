@@ -1,10 +1,12 @@
 import os
 
+from authlib.integrations.flask_client import OAuth
+from celery import Celery
 from flask import Flask, render_template
 from flask_cors import CORS
+from flask_mailman import EmailMultiAlternatives, Mail
 from flask_restful import Api
-from flask_security import Security, auth_required, hash_password, \
-    SQLAlchemySessionUserDatastore
+from flask_security import Security, hash_password, SQLAlchemySessionUserDatastore, MailUtil
 
 from api.booking_api import BookingsAPI
 from api.review_api import ReviewsAPI
@@ -31,11 +33,42 @@ init_db()
 app.app_context().push()
 app.logger.info("App setup complete")
 
+
+class MyMailUtil(MailUtil):
+    def send_mail(self, template, subject, recipient, sender, body, html, **kwargs):
+        send_flask_mail.delay(
+            subject=subject,
+            from_email=sender,
+            to=[recipient],
+            body=body,
+            html=html,
+        )
+
+
 # Setup Flask-Security
 user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
-app.security = Security(app, user_datastore)
-api = Api(app)
+app.security = Security(app, user_datastore, mail_util_cls=MyMailUtil)
+
+# Setup Celery
+# backend = "redis://localhost:6379/0"
+# broker = backend.replace("0", "1")
+celery = Celery(__name__)  # , #backend=backend, broker=broker)
+celery.conf.update(app.config)
+TaskBase = celery.Task
+
+
+class ContextTask(TaskBase):
+    def __call__(self, *args, **kwargs):
+        with app.app_context():
+            return TaskBase.__call__(self, *args, **kwargs)
+
+
+celery.Task = ContextTask
+
 CORS(app)
+api = Api(app)
+oauthapp = OAuth(app)  # ignore Typo
+mail = Mail(app)
 app.app_context().push()
 
 # one time setup
@@ -49,9 +82,20 @@ with app.app_context():
 # APIs for the application
 api.add_resource(ShowsAPI, "/api/shows")
 api.add_resource(TheatresAPI, "/api/theatre")
-api.add_resource(ReviewsAPI, "/api/reviews")
-api.add_resource(BookingsAPI, "/api/bookings")
+api.add_resource(ReviewsAPI, "/api/review")
+api.add_resource(BookingsAPI, "/api/booking")
 api.add_resource(RunningAPI, "/api/running")
+
+
+@celery.task
+def send_flask_mail(**kwargs):
+    with app.app_context():
+        with mail.get_connection() as connection:
+            html = kwargs.pop("html", None)
+            msg = EmailMultiAlternatives(**kwargs, connection=connection)
+            if html:
+                msg.attach_alternative(html, "text/html")
+            msg.send()
 
 
 # Import all the controllers, so they are loaded
@@ -75,7 +119,6 @@ api.add_resource(RunningAPI, "/api/running")
 
 
 @app.route("/")
-@auth_required()
 def home():
     return render_template("swagger.html")
 
