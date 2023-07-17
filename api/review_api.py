@@ -1,4 +1,5 @@
 from flask_restful import Resource, reqparse, abort, marshal_with, fields
+from sqlalchemy.exc import NoResultFound
 
 from application.database import db_session
 from application.models import Review
@@ -6,10 +7,9 @@ from application.models import Review
 
 def abort_if_review_doesnt_exist(rid):
     try:
-        if rid != Review.query.filter_by(id=rid).one().id:
-            abort(404, message="Review with ID: {} doesn't exist".format(rid))
-    except Exception as e:
-        abort(404, message=str(e))
+        Review.query.filter_by(id=rid).one()
+    except NoResultFound as e:
+        abort(404, message="Theatre with ID: {} doesn't exist".format(rid))
 
 
 parser = reqparse.RequestParser()  # for GET, DELETE requests

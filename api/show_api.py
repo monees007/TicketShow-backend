@@ -1,4 +1,5 @@
 from flask_restful import Resource, reqparse, abort, marshal_with, fields
+from sqlalchemy.exc import NoResultFound
 
 from application.database import db_session
 from application.models import Show
@@ -6,11 +7,9 @@ from application.models import Show
 
 def abort_if_show_doesnt_exist(sid):
     try:
-        if sid != Show.query.filter_by(id=sid).one().id:
-            abort(404, message="Show with ID: {} doesn't exist".format(sid))
-    except Exception as e:
-        abort(404, message=str(e))
-
+        Show.query.filter_by(id=sid).one()
+    except NoResultFound as e:
+        abort(404, message="Theatre with ID: {} doesn't exist".format(sid))
 
 parser = reqparse.RequestParser()  # for GET, DELETE requests
 parser.add_argument('id', required=True, type=int, location='args')
