@@ -1,12 +1,11 @@
 import os
 
 from authlib.integrations.flask_client import OAuth
-from celery import Celery
 from flask import Flask, render_template
 from flask_cors import CORS
-from flask_mailman import EmailMultiAlternatives, Mail
+from flask_mailman import Mail
 from flask_restful import Api
-from flask_security import Security, hash_password, SQLAlchemySessionUserDatastore, MailUtil
+from flask_security import Security, hash_password, SQLAlchemySessionUserDatastore
 
 from api.booking_api import BookingsAPI
 from api.review_api import ReviewsAPI
@@ -14,6 +13,8 @@ from api.running_api import RunningAPI
 from api.show_api import ShowsAPI
 from api.theater_api import TheatresAPI
 from application import swagger_render
+from application import tasks
+from application import workers
 from application.config import LocalDevelopmentConfig
 from application.database import db_session, init_db
 from application.models import User, Role
@@ -33,40 +34,46 @@ init_db()
 app.app_context().push()
 app.logger.info("App setup complete")
 
-
-class MyMailUtil(MailUtil):
-    def send_mail(self, template, subject, recipient, sender, body, html, **kwargs):
-        send_flask_mail.delay(
-            subject=subject,
-            from_email=sender,
-            to=[recipient],
-            body=body,
-            html=html,
-        )
+# class MyMailUtil(MailUtil):
+#     def send_mail(self, template, subject, recipient, sender, body, html, **kwargs):
+#         send_flask_mail.delay(
+#             subject=subject,
+#             from_email=sender,
+#             to=[recipient],
+#             body=body,
+#             html=html,
+#         )
 
 
 # Setup Flask-Security
 user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
-app.security = Security(app, user_datastore, mail_util_cls=MyMailUtil)
+app.security = Security(app, user_datastore)  # , mail_util_cls=MyMailUtil)
 
-# Setup Celery
-# backend = "redis://localhost:6379/0"
-# broker = backend.replace("0", "1")
-celery = Celery(__name__)  # , #backend=backend, broker=broker)
-celery.conf.update(app.config)
-TaskBase = celery.Task
-
-
-class ContextTask(TaskBase):
-    def __call__(self, *args, **kwargs):
-        with app.app_context():
-            return TaskBase.__call__(self, *args, **kwargs)
+# # Setup Celery
+# # backend = "redis://localhost:6379/0"
+# # broker = backend.replace("0", "1")
+# celery = Celery(__name__)  # , #backend=backend, broker=broker)
+# celery.conf.update(app.config)
+# TaskBase = celery.Task
 
 
-celery.Task = ContextTask
+# class ContextTask(TaskBase):
+#     def __call__(self, *args, **kwargs):
+#         with app.app_context():
+#             return TaskBase.__call__(self, *args, **kwargs)
+
+
+# celery.Task = ContextTask
 
 CORS(app)
 api = Api(app)
+celery = workers.celery
+celery.conf.update(
+    broker_url=app.config['CELERY_BROKER_URL'],
+    result_backend=app.config['CELERY_RESULT_BACKEND']
+)
+celery.Task = workers.ContextTask
+
 oauthapp = OAuth(app)  # ignore Typo
 mail = Mail(app)
 app.app_context().push()
@@ -87,15 +94,15 @@ api.add_resource(BookingsAPI, "/api/booking")
 api.add_resource(RunningAPI, "/api/running")
 
 
-@celery.task
-def send_flask_mail(**kwargs):
-    with app.app_context():
-        with mail.get_connection() as connection:
-            html = kwargs.pop("html", None)
-            msg = EmailMultiAlternatives(**kwargs, connection=connection)
-            if html:
-                msg.attach_alternative(html, "text/html")
-            msg.send()
+# @celery.task
+# def send_flask_mail(**kwargs):
+#     with app.app_context():
+#         with mail.get_connection() as connection:
+#             html = kwargs.pop("html", None)
+#             msg = EmailMultiAlternatives(**kwargs, connection=connection)
+#             if html:
+#                 msg.attach_alternative(html, "text/html")
+#             msg.send()
 
 
 # Import all the controllers, so they are loaded
@@ -121,6 +128,12 @@ def send_flask_mail(**kwargs):
 @app.route("/")
 def home():
     return render_template("swagger.html")
+
+
+@app.route("/hello/<name>")
+def hello(name):
+    job = tasks.hello_there.delay(name)
+    return str(job), 200
 
 
 if __name__ == '__main__':
