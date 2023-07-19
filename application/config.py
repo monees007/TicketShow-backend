@@ -21,6 +21,14 @@ class Config():
     SECURITY_OAUTH_ENABLE = True
     SECURITY_SEND_REGISTER_EMAIL = False
     SECURITY_UNAUTHORIZED_VIEW = None
+    MAIL_SERVER = 'smtp.mailgun.org'
+    MAIL_PORT = 587
+    MAIL_USERNAME = "postmaster@sandbox1c10f67a4d8d48368d6045147034f119.mailgun.org"
+    MAIL_PASSWORD = "fa4311bd80bf60953e0170ed11df5203-c30053db-68919d7e"
+    MAIL_USE_TLS = True
+    MAIL_USE_SSL = False
+    # MAIL_DEFAULT_SENDER = 'noreply@localhost'
+
     # SECURITY_USERNAME_ENABLE = True
 
 class LocalDevelopmentConfig(Config):

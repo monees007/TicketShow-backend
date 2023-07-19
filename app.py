@@ -3,7 +3,7 @@ import os
 from authlib.integrations.flask_client import OAuth
 from flask import Flask, render_template
 from flask_cors import CORS
-from flask_mailman import Mail
+from flask_mailman import Mail, EmailMultiAlternatives
 from flask_restful import Api
 from flask_security import Security, hash_password, SQLAlchemySessionUserDatastore
 
@@ -36,14 +36,17 @@ app.logger.info("App setup complete")
 
 # class MyMailUtil(MailUtil):
 #     def send_mail(self, template, subject, recipient, sender, body, html, **kwargs):
-#         send_flask_mail.delay(
-#             subject=subject,
-#             from_email=sender,
-#             to=[recipient],
-#             body=body,
-#             html=html,
-#         )
-
+#         try:
+#             send_flask_mail.delay(
+#                 subject=subject,
+#                 from_email=sender,
+#                 to=[recipient],
+#                 body=body,
+#                 html=html,
+#             )
+#         except smtplib.SMTPDataError as e:
+#             print(e)
+#             flash("Add this reciever at Mailman Sandbox", "error")
 
 # Setup Flask-Security
 user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
@@ -94,15 +97,15 @@ api.add_resource(BookingsAPI, "/api/booking")
 api.add_resource(RunningAPI, "/api/running")
 
 
-# @celery.task
-# def send_flask_mail(**kwargs):
-#     with app.app_context():
-#         with mail.get_connection() as connection:
-#             html = kwargs.pop("html", None)
-#             msg = EmailMultiAlternatives(**kwargs, connection=connection)
-#             if html:
-#                 msg.attach_alternative(html, "text/html")
-#             msg.send()
+@celery.task
+def send_flask_mail(**kwargs):
+    with app.app_context():
+        with mail.get_connection() as connection:
+            html = kwargs.pop("html", None)
+            msg = EmailMultiAlternatives(**kwargs, connection=connection)
+            if html:
+                msg.attach_alternative(html, "text/html")
+            msg.send()
 
 
 # Import all the controllers, so they are loaded
