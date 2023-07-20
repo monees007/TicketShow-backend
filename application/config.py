@@ -2,7 +2,8 @@ import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-class Config():
+
+class Config:
     DEBUG = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     WTF_CSRF_ENABLED = False
@@ -30,6 +31,15 @@ class Config():
     # MAIL_DEFAULT_SENDER = 'noreply@localhost'
 
     # SECURITY_USERNAME_ENABLE = True
+
+    # REDIS Caching
+    CACHE_TYPE = "redis"
+    CACHE_REDIS_HOST = "localhost"
+    CACHE_REDIS_PORT = 6379
+    CACHE_REDIS_DB = 0
+    CACHE_REDIS_URL = "redis://localhost:6379/0"
+    CACHE_DEFAULT_TIMEOUT = 500
+
 
 class LocalDevelopmentConfig(Config):
     DEBUG = True

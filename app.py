@@ -2,8 +2,9 @@ import os
 
 from authlib.integrations.flask_client import OAuth
 from flask import Flask, render_template
+from flask_caching import Cache
 from flask_cors import CORS
-from flask_mailman import Mail, EmailMultiAlternatives
+from flask_mailman import Mail
 from flask_restful import Api
 from flask_security import Security, hash_password, SQLAlchemySessionUserDatastore
 
@@ -33,41 +34,10 @@ else:
 init_db()
 app.app_context().push()
 app.logger.info("App setup complete")
-
-# class MyMailUtil(MailUtil):
-#     def send_mail(self, template, subject, recipient, sender, body, html, **kwargs):
-#         try:
-#             send_flask_mail.delay(
-#                 subject=subject,
-#                 from_email=sender,
-#                 to=[recipient],
-#                 body=body,
-#                 html=html,
-#             )
-#         except smtplib.SMTPDataError as e:
-#             print(e)
-#             flash("Add this reciever at Mailman Sandbox", "error")
-
-# Setup Flask-Security
 user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
 app.security = Security(app, user_datastore)  # , mail_util_cls=MyMailUtil)
 
-# # Setup Celery
-# # backend = "redis://localhost:6379/0"
-# # broker = backend.replace("0", "1")
-# celery = Celery(__name__)  # , #backend=backend, broker=broker)
-# celery.conf.update(app.config)
-# TaskBase = celery.Task
-
-
-# class ContextTask(TaskBase):
-#     def __call__(self, *args, **kwargs):
-#         with app.app_context():
-#             return TaskBase.__call__(self, *args, **kwargs)
-
-
-# celery.Task = ContextTask
-
+cache = Cache(app)
 CORS(app)
 api = Api(app)
 celery = workers.celery
@@ -77,7 +47,7 @@ celery.conf.update(
 )
 celery.Task = workers.ContextTask
 
-oauthapp = OAuth(app)  # ignore Typo
+oauthapp = OAuth(app)
 mail = Mail(app)
 app.app_context().push()
 
@@ -97,15 +67,18 @@ api.add_resource(BookingsAPI, "/api/booking")
 api.add_resource(RunningAPI, "/api/running")
 
 
-@celery.task
-def send_flask_mail(**kwargs):
-    with app.app_context():
-        with mail.get_connection() as connection:
-            html = kwargs.pop("html", None)
-            msg = EmailMultiAlternatives(**kwargs, connection=connection)
-            if html:
-                msg.attach_alternative(html, "text/html")
-            msg.send()
+# @celery.task
+# def send_flask_mail(**kwargs):
+#     try:
+#         with app.app_context():
+#             with mail.get_connection() as connection:
+#                 html = kwargs.pop("html", None)
+#                 msg = EmailMultiAlternatives(**kwargs, connection=connection)
+#                 if html:
+#                     msg.attach_alternative(html, "text/html")
+#                 msg.send()
+#     except smtplib.SMTPDataError as e:
+#         flash("Verify the user with Mailgun Sandbox")
 
 
 # Import all the controllers, so they are loaded
