@@ -18,7 +18,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(SQLITE_DB_DIR, "db.sqlite3")
     SECURITY_PASSWORD_HASH = "bcrypt"
     SECURITY_REGISTERABLE = True  # do not correct spelling
-    SECURITY_CONFIRMABLE = True
+    SECURITY_CONFIRMABLE = False
     SECURITY_OAUTH_ENABLE = True
     SECURITY_SEND_REGISTER_EMAIL = False
     SECURITY_UNAUTHORIZED_VIEW = None
@@ -30,8 +30,7 @@ class Config:
     MAIL_USE_SSL = False
     # MAIL_DEFAULT_SENDER = 'noreply@localhost'
 
-    # SECURITY_USERNAME_ENABLE = True
-
+    SECURITY_USERNAME_ENABLE = True
     # REDIS Caching
     CACHE_TYPE = "redis"
     CACHE_REDIS_HOST = "localhost"
@@ -39,6 +38,18 @@ class Config:
     CACHE_REDIS_DB = 0
     CACHE_REDIS_URL = "redis://localhost:6379/0"
     CACHE_DEFAULT_TIMEOUT = 500
+
+    # SPA
+    SECURITY_REDIRECT_BEHAVIOR = "spa"
+    SECURITY_FLASH_MESSAGES = False
+    SECURITY_CSRF_PROTECT_MECHANISMS = ["session", "basic"]
+    SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS = True
+
+    # Send Cookie with csrf-token. This is the default for Axios and Angular.
+    SECURITY_CSRF_COOKIE_NAME = "XSRF-TOKEN"
+    WTF_CSRF_CHECK_DEFAULT = False
+    WTF_CSRF_TIME_LIMIT = None
+    SECURITY_REDIRECT_HOST = 'localhost:8080'
 
 
 class LocalDevelopmentConfig(Config):

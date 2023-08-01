@@ -9,6 +9,7 @@ from flask_restful import Api
 from flask_security import Security, hash_password, SQLAlchemySessionUserDatastore
 
 from api.booking_api import BookingsAPI
+from api.bulk_api import BulkShowsApi, BulkRunningApi, BulkTheatreApi
 from api.review_api import ReviewsAPI
 from api.running_api import RunningAPI
 from api.show_api import ShowsAPI
@@ -65,6 +66,9 @@ api.add_resource(TheatresAPI, "/api/theatre")
 api.add_resource(ReviewsAPI, "/api/review")
 api.add_resource(BookingsAPI, "/api/booking")
 api.add_resource(RunningAPI, "/api/running")
+api.add_resource(BulkShowsApi, "/api/bulk/shows")
+api.add_resource(BulkTheatreApi, "/api/bulk/theatre")
+api.add_resource(BulkRunningApi, "/api/bulk/running")
 
 
 # @celery.task

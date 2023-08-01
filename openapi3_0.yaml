@@ -25,6 +25,7 @@ externalDocs:
 servers:
   - url: http://127.0.0.1:4433
 tags:
+  - name: bulk
   - name: show
     description: Operations about Shows
     externalDocs:
@@ -502,6 +503,119 @@ paths:
                 $ref: '#/components/schemas/Theatre'
         '405':
           description: Invalid input
+  /api/bulk/shows:
+    get:
+      tags:
+        - bulk
+      summary: Add multiple new show to the database
+      responses:
+        200:
+          description: "good"
+    post:
+      tags:
+        - bulk
+      summary: Add multiple new show to the database
+      description: Add multiple new show to the database
+      operationId: addShow
+      requestBody:
+        description: Create multiple new show in the database
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Show'
+
+        required: false
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Show'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Show'
+        '405':
+          description: Invalid input
+  /api/bulk/theatre:
+    get:
+      tags:
+        - bulk
+      summary: Give bulk json
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Show'
+    post:
+      tags:
+        - bulk
+      summary: Add multiple new theatres to the database
+      description: Add multiple new theatres to the database
+      operationId: addTheatreBulk
+      requestBody:
+        description: Create multiple new theatres in the database
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Theatre'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Theatre'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Theatre'
+        '405':
+          description: Invalid input
+
+
+  /api/bulk/running:
+    get:
+      tags:
+        - bulk
+      summary: Give bulk json
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Running'
+    post:
+      tags:
+        - bulk
+      summary: Add multiple running to the database
+      description: Add multiple running to the database
+      operationId: addRunningBulk
+      requestBody:
+        description: Create multiple running in the database
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Running'
+
+        required: false
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Running'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Running'
+        '405':
+          description: Invalid input
+
 
   /login:
     get:
@@ -1314,9 +1428,9 @@ components:
           type: boolean
           description: >
             If true, will remember userid as part of cookie. There is a configuration variable DEFAULT_REMEMBER_ME that can be set. This field will override that.
-        tf_validity_token:
-          type: string
-          description: Code verifying the user has successfully verified 2FA in the past. If verified, the user is able to skip validation of the second factor. Only used when SECURITY_TWO_FACTOR_ALWAYS_VALIDATE is False.
+    #        tf_validity_token:
+    #          type: string
+    #          description: Code verifying the user has successfully verified 2FA in the past. If verified, the user is able to skip validation of the second factor. Only used when SECURITY_TWO_FACTOR_ALWAYS_VALIDATE is False.
     LoginJsonResponse:
       type: object
       description: >
@@ -1974,7 +2088,11 @@ components:
                 type: integer
 
   securitySchemes:
-    api_key:
+    Authentication-Token:
       type: apiKey
-      name: api_key
       in: header
+      name: Authentication-Token
+
+
+security:
+  - Authentication-Token: [ ]

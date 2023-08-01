@@ -19,6 +19,9 @@ class Role(Base, RoleMixin):
     description = Column(String(255))
     permissions = Column(UnicodeText)
 
+    def as_dict(self):
+        return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
+
 
 class User(Base, UserMixin):
     __tablename__ = 'user'
@@ -38,6 +41,9 @@ class User(Base, UserMixin):
     roles = relationship('Role', secondary='roles_users',
                          backref=backref('users', lazy='dynamic'))
 
+    def as_dict(self):
+        return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
+
 
 class Theatre(Base):
     __tablename__ = "theatre"
@@ -45,6 +51,10 @@ class Theatre(Base):
     name = Column(String(255), nullable=False)
     place = Column(String(255), nullable=False)
     capacity = Column(Integer, default=0)
+    user_id = Column(Integer, ForeignKey("user.id"))
+
+    def as_dict(self):
+        return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
 
 
 class Show(Base):
@@ -58,6 +68,10 @@ class Show(Base):
     ticket_price = Column(Float())
     format = Column(String(255), nullable=False)
     language = Column(String(255), nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id"))
+
+    def as_dict(self):
+        return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
 
 
 class Running(Base):
@@ -66,6 +80,9 @@ class Running(Base):
     theatre_id = Column(Integer, ForeignKey("theatre.id"))
     show_id = Column(Integer, ForeignKey("show.id"))
     date = Column(DateTime(), server_default=func.now())
+
+    def as_dict(self):
+        return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
 
 
 class Booking(Base):
@@ -76,14 +93,21 @@ class Booking(Base):
     seats = Column(String(255))
     total_price = Column(Float())
 
+    def as_dict(self):
+        return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
+
 
 class Review(Base):
     __tablename__ = "review"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("user.id"))
     show_id = Column(Integer, ForeignKey("show.id"))
+    theatre_id = Column(Integer, ForeignKey("theatre.id"))
     rating = Column(Integer)
     review = Column(String(255))
+
+    def as_dict(self):
+        return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
 
 
 class UserReview(Base):
@@ -93,26 +117,5 @@ class UserReview(Base):
     review_id = Column(Integer, ForeignKey("review.id"))
     like = Column(Boolean)
 
-
-class UserBooking(Base):
-    __tablename__ = "user_booking"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("user.id"))
-    booking_id = Column(Integer, ForeignKey("booking.id"))
-    like = Column(Boolean)
-
-
-class UserShow(Base):
-    __tablename__ = "user_show"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("user.id"))
-    show_id = Column(Integer, ForeignKey("show.id"))
-    like = Column(Boolean)
-
-
-class UserTheatre(Base):
-    __tablename__ = "user_theatre"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("user.id"))
-    theatre_id = Column(Integer, ForeignKey("theatre.id"))
-    like = Column(Boolean)
+    def as_dict(self):
+        return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
