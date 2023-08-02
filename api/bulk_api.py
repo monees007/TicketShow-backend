@@ -20,7 +20,6 @@ class BulkShowsApi(Resource):
             json = request.get_json(force=True)
             for args in json:
                 get_or_create(model=Show, name=args['name'],
-                              rating=args['rating'],
                               image_url=args['image_url'],
                               image_sqr=args['image_sqr'],
                               tags=args['tags'],
