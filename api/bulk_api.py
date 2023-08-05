@@ -19,15 +19,9 @@ class BulkShowsApi(Resource):
         try:
             json = request.get_json(force=True)
             for args in json:
-                get_or_create(model=Show, name=args['name'],
-                              image_url=args['image_url'],
-                              image_sqr=args['image_sqr'],
-                              tags=args['tags'],
-                              ticket_price=args['ticket_price'],
-                              format=args['format'],
-                              language=args['language'],
-                              user_id=current_user.id
-                              )
+                get_or_create(model=Show, name=args['name'], image_url=args['image_url'], image_sqr=args['image_sqr'],
+                              tags=args['tags'], ticket_price=args['ticket_price'], format=args['format'],
+                              language=args['language'], user_id=current_user.id)
             db_session.commit()
             return {'success': True}, 200
         except Exception as e:
@@ -46,10 +40,7 @@ class BulkTheatreApi(Resource):
         try:
             json = request.get_json(force=True)
             for args in json:
-                get_or_create(Theatre,
-                              name=args['name'],
-                              place=args['place'],
-                              capacity=args['capacity'],
+                get_or_create(Theatre, name=args['name'], place=args['place'], capacity=args['capacity'],
                               user_id=current_user.id)
             db_session.commit()
             return {'success': True}, 200
@@ -61,8 +52,9 @@ class BulkTheatreApi(Resource):
 class BulkRunningApi(Resource):
     @auth_required('token')
     def get(self):
-        stmt = db_session.query(Running).join(Theatre, Running.theatre_id == Theatre.theatre_id).where(
-            Theatre.user_id == current_user.id).all()
+        stmt = (db_session.query(Running.theatre_id, Running.show_id)
+                .join(Theatre, Running.theatre_id == Theatre.id)
+                .where(Theatre.user_id == current_user.id).all())
         return [x.as_dict() for x in stmt]
 
     @staticmethod
@@ -70,12 +62,7 @@ class BulkRunningApi(Resource):
         try:
             json = request.get_json(force=True)
             for args in json:
-                running = get_or_create(Running,
-                                        theatre_id=args['theatre_id'],
-                                        show_id=args['show_id'],
-                                        date=args['date'])
-                Running.ge(running)
-                get_or_create(running)
+                get_or_create(Running, theatre_id=args['theatre_id'], show_id=args['show_id'], date=args['date'])
             db_session.commit()
             return {'success': True}, 200
         except Exception as e:

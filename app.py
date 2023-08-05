@@ -14,6 +14,7 @@ from api.review_api import ReviewsAPI
 from api.running_api import RunningAPI
 from api.show_api import ShowsAPI
 from api.theater_api import TheatresAPI
+from api.views_api import HomePageAPI
 from application import swagger_render
 from application import tasks
 from application import workers
@@ -69,6 +70,7 @@ api.add_resource(RunningAPI, "/api/running")
 api.add_resource(BulkShowsApi, "/api/bulk/shows")
 api.add_resource(BulkTheatreApi, "/api/bulk/theatre")
 api.add_resource(BulkRunningApi, "/api/bulk/running")
+api.add_resource(HomePageAPI, "/api/homepage")
 
 
 # @celery.task

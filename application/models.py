@@ -52,6 +52,8 @@ class Theatre(Base):
     place = Column(String(255), nullable=False)
     capacity = Column(Integer, default=0)
     user_id = Column(Integer, ForeignKey("user.id"))
+    rating = Column(Integer)
+    city = Column(String(255))
 
     def as_dict(self):
         return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
