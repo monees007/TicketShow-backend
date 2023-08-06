@@ -42,6 +42,7 @@ def create_instance(model, **kwargs):
         instance = model(**kwargs)
         db_session.add(instance)
         db_session.flush()
+        db_session.commit()
     except Exception as msg:
         mtext = 'model:{}, args:{} => msg:{}'
         print(mtext.format(model, kwargs, msg))

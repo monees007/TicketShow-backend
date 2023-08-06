@@ -52,12 +52,11 @@ class BulkTheatreApi(Resource):
 class BulkRunningApi(Resource):
     @auth_required('token')
     def get(self):
-        stmt = (db_session.query(Running.theatre_id, Running.show_id)
+        stmt = (db_session.query(Running)
                 .join(Theatre, Running.theatre_id == Theatre.id)
                 .where(Theatre.user_id == current_user.id).all())
         return [x.as_dict() for x in stmt]
 
-    @staticmethod
     def post():
         try:
             json = request.get_json(force=True)

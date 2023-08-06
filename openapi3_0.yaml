@@ -2034,8 +2034,18 @@ components:
                 type: integer
               theatre_id:
                 type: integer
-              date:
-                type: integer
+              start:
+                type: string
+              end:
+                type: string
+              language:
+                type: string
+              format:
+                type: string
+              ticket_price:
+                type: number
+              show_name:
+                type: string
     Booking_i:
       description: booking object post
       content:

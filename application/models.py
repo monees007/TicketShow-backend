@@ -1,5 +1,5 @@
 from flask_security import UserMixin, RoleMixin
-from sqlalchemy import Boolean, DateTime, Column, Integer, String, ForeignKey, UnicodeText, Float, func
+from sqlalchemy import Boolean, DateTime, Column, Integer, String, ForeignKey, UnicodeText, Float
 from sqlalchemy.orm import relationship, backref
 
 from application.database import Base
@@ -85,7 +85,12 @@ class Running(Base):
     id = Column(Integer, primary_key=True)
     theatre_id = Column(Integer, ForeignKey("theatre.id"))
     show_id = Column(Integer, ForeignKey("show.id"))
-    date = Column(DateTime(), server_default=func.now())
+    show_name = Column(String(255), ForeignKey("show.name"))
+    start = Column(String(255))
+    end = Column(String(255))
+    language = Column(String(255), nullable=False)
+    ticket_price = Column(Float())
+    format = Column(String(255), nullable=False)
 
     def as_dict(self):
         return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
