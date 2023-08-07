@@ -2,7 +2,6 @@ import os
 
 from authlib.integrations.flask_client import OAuth
 from flask import Flask, render_template
-from flask_caching import Cache
 from flask_cors import CORS
 from flask_mailman import Mail
 from flask_restful import Api
@@ -15,7 +14,8 @@ from api.running_api import RunningAPI
 from api.show_api import ShowsAPI
 from api.theater_api import TheatresAPI
 from api.user_api import UserAPI
-from api.views_api import HomePageAPI
+from api.views_api import HomePageAPI, SearchAPI
+from application import cache
 from application import swagger_render
 from application import tasks
 from application import workers
@@ -40,7 +40,7 @@ app.logger.info("App setup complete")
 user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
 app.security = Security(app, user_datastore)  # , mail_util_cls=MyMailUtil)
 
-cache = Cache(app)
+cache.init_app(app)
 CORS(app)
 api = Api(app)
 celery = workers.celery
@@ -72,6 +72,7 @@ api.add_resource(BulkShowsApi, "/api/bulk/shows")
 api.add_resource(BulkTheatreApi, "/api/bulk/theatre")
 api.add_resource(BulkRunningApi, "/api/bulk/running")
 api.add_resource(HomePageAPI, "/api/homepage")
+api.add_resource(SearchAPI, "/api/search")
 api.add_resource(UserAPI, "/api/user")
 
 

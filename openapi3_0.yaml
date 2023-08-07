@@ -39,6 +39,33 @@ tags:
   - name: user
     description: Operations about user
 paths:
+  /api/search:
+    get:
+      tags:
+        - search
+      summary: Search a show/theatre
+      description: Search a show/theatre by name.
+      operationId: search
+      parameters:
+        - name: search_string
+          in: query
+          description: search_string values that need to be considered for filter
+          required: true
+          schema:
+            type: string
+        - name: search_type
+          in: query
+          description: search_type values that need to be considered for filter
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
   /api/shows:
     get:
       tags:
