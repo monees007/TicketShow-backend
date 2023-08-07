@@ -91,6 +91,7 @@ class Running(Base):
     language = Column(String(255), nullable=False)
     ticket_price = Column(Float())
     format = Column(String(255), nullable=False)
+    occupied_seats = Column(String(255), nullable=True)
 
     def as_dict(self):
         return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
@@ -103,6 +104,14 @@ class Booking(Base):
     running_id = Column(Integer, ForeignKey("running.id"))
     seats = Column(String(255))
     total_price = Column(Float())
+    theatre_name = Column(String(255))
+    theatre_place = Column(String(255))
+    show_name = Column(String(255))
+    start = Column(String(255))
+    end = Column(String(255))
+    language = Column(String(255), nullable=False)
+    format = Column(String(255), nullable=False)
+    date = Column(String(255))
 
     def as_dict(self):
         return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}

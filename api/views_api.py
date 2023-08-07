@@ -6,6 +6,7 @@ from application.models import Running, Theatre, Show
 
 
 class HomePageAPI(Resource):
+
     def get(self):
         """
         datastructure of return:
