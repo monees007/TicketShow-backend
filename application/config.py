@@ -13,6 +13,18 @@ cacheConfig = {
 }
 
 
+# celeryConfig = {
+#     "broker_url": "redis://redis",
+#     "result_backend": "redis://redis",
+#     "beat_schedule": {
+#         "reminder_email": {
+#             "task": "app.send_flask_mail",
+#             "schedule": 10,
+#         }
+#     }
+# }
+
+
 class Config():
     DEBUG = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -22,6 +34,8 @@ class Config():
     GOOGLE_CLIENT_SECRET = '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'
     GITHUB_CLIENT_ID = 'Iv1.e8d9d28168ffef59'
     GITHUB_CLIENT_SECRET = '7535a4842dd80137d6c6601275b8b55f3d27ab65'
+    # Celery Configs
+    # CELERY_CONFIG = celeryConfig
     CELERY_BROKER_URL = 'redis://localhost:6379/1'
     CELERY_RESULT_BACKEND = 'redis://localhost:6379/2'
     SQLITE_DB_DIR = os.path.join(basedir, "../database")
@@ -38,14 +52,12 @@ class Config():
     SECURITY_USERNAME_ENABLE = True
 
     # Flask-Mail configuration
-    MAIL_SERVER = 'smtp.mailgun.org'
-    MAIL_PORT = 587
-    MAIL_USERNAME = "postmaster@sandbox1c10f67a4d8d48368d6045147034f119.mailgun.org"
-    MAIL_PASSWORD = "fa4311bd80bf60953e0170ed11df5203-c30053db-68919d7e"
+    MAIL_SERVER = 'sandbox.smtp.mailtrap.io'
+    MAIL_PORT = 2525
+    MAIL_USERNAME = 'f3cc19503b3edc'
+    MAIL_PASSWORD = '8763655e4bc55d'
     MAIL_USE_TLS = True
     MAIL_USE_SSL = False
-    # MAIL_DEFAULT_SENDER = 'noreply@localhost'
-
 
     # SPA
     SECURITY_REDIRECT_BEHAVIOR = "spa"

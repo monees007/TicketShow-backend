@@ -1,9 +1,11 @@
 import os
+from datetime import datetime, timedelta
 
 from authlib.integrations.flask_client import OAuth
+from celery.schedules import crontab
 from flask import Flask, render_template
 from flask_cors import CORS
-from flask_mailman import Mail
+from flask_mailman import Mail, EmailMessage
 from flask_restful import Api
 from flask_security import Security, hash_password, SQLAlchemySessionUserDatastore
 
@@ -17,7 +19,7 @@ from api.user_api import UserAPI
 from api.views_api import HomePageAPI, SearchAPI
 from application import cache
 from application import swagger_render
-from application import tasks
+# from application import tasks
 from application import workers
 from application.config import LocalDevelopmentConfig
 from application.database import db_session, init_db
@@ -44,10 +46,9 @@ cache.init_app(app)
 CORS(app)
 api = Api(app)
 celery = workers.celery
-celery.conf.update(
-    broker_url=app.config['CELERY_BROKER_URL'],
-    result_backend=app.config['CELERY_RESULT_BACKEND']
-)
+celery.conf.update(broker_url=app.config['CELERY_BROKER_URL'], result_backend=app.config['CELERY_RESULT_BACKEND'])
+
+# celery.config_from_object(celery_config)
 celery.Task = workers.ContextTask
 
 oauthapp = OAuth(app)
@@ -76,28 +77,32 @@ api.add_resource(SearchAPI, "/api/search")
 api.add_resource(UserAPI, "/api/user")
 
 
-# @celery.task
-# def send_flask_mail(**kwargs):
-#     try:
-#         with app.app_context():
-#             with mail.get_connection() as connection:
-#                 html = kwargs.pop("html", None)
-#                 msg = EmailMultiAlternatives(**kwargs, connection=connection)
-#                 if html:
-#                     msg.attach_alternative(html, "text/html")
-#                 msg.send()
-#     except smtplib.SMTPDataError as e:
-#         flash("Verify the user with Mailgun Sandbox")
+@celery.on_after_configure.connect
+def setup_periodic_tasks(sender, **kwargs):
+    sender.add_periodic_task(crontab(hour='24'), send_reminders.s())
+    sender.add_periodic_task(hello_there('man').s(), name="hello t")
 
 
-# Import all the controllers, so they are loaded
-# from application.controllers import *
+@celery.task()
+def hello_there(name):
+    print("Hello there, {}".format(name))
+    return "Hello there, {}".format(name)
 
-# # Add all restful controllers
-# from application.api import ArticleLikesAPI
-# api.add_resource(ArticleLikesAPI, "/api/article_likes", "/api/article_likes/<int:article_id>")
-#
 
+@celery.task()
+def send_reminders(*args, **kwargs):
+    emails = db_session.query(User.email).where(User.last_login_at < datetime.utcnow() - timedelta(minutes=1)).all()
+    emails = [x[0] for x in emails]
+    with mail.get_connection() as c:
+        email1 = EmailMessage("We missed you today", """<h1> We missed you today. </h1>
+                            <p> We noticed that you did not login today. We hope to see you soon. </p>
+                            <p> Regards, </p>
+                            <p> Team TicketShow </p>""", 'from@example.com', emails, connection=c, )
+        email1.content_subtype = "html"  # Main content is now text/html
+        email1.send()
+
+
+# Error handlers
 # @app.errorhandler(404)
 # def page_not_found(e):
 #     # note that we set the 404 status explicitly
@@ -113,12 +118,6 @@ api.add_resource(UserAPI, "/api/user")
 @app.route("/")
 def home():
     return render_template("swagger.html")
-
-
-@app.route("/hello/<name>")
-def hello(name):
-    job = tasks.hello_there.delay(name)
-    return str(job), 200
 
 
 if __name__ == '__main__':
