@@ -1,8 +1,9 @@
 from flask_restful import Resource, reqparse, abort, marshal_with, fields
+from flask_security import current_user
 from sqlalchemy.exc import NoResultFound
 
 from application.database import db_session
-from application.models import Review
+from application.models import Review, User
 
 
 def abort_if_review_doesnt_exist(rid):
@@ -13,11 +14,13 @@ def abort_if_review_doesnt_exist(rid):
 
 
 parser = reqparse.RequestParser()  # for GET, DELETE requests
-parser.add_argument('id', required=True, type=int, location='args')
+parser.add_argument('id', required=False, type=int, location='args')
+parser.add_argument('tid', required=False, type=int, location='args')
+parser.add_argument('sid', required=False, type=int, location='args')
 
 parser2 = reqparse.RequestParser()  # for POST requests
-parser2.add_argument('user_id', required=True, type=int)
-parser2.add_argument('show_id', required=True, type=int)
+parser2.add_argument('show_id', required=False, type=int)
+parser2.add_argument('theatre_id', required=False, type=int)
 parser2.add_argument('rating', required=True, type=int)
 parser2.add_argument('review', required=True, type=str)
 
@@ -28,21 +31,39 @@ resource_fields = {
     'id': fields.Integer,
     'user_id': fields.Integer,
     'show_id': fields.Integer,
+    'theatre_id': fields.Integer,
     'rating': fields.Integer,
     'review': fields.String
 }
 
 
 class ReviewsAPI(Resource):
-    @marshal_with(resource_fields)
+    @marshal_with({
+        'email': fields.String,
+        'username': fields.String,
+        'id': fields.Integer,
+        'user_id': fields.Integer,
+        'show_id': fields.Integer,
+        'theatre_id': fields.Integer,
+        'rating': fields.Integer,
+        'review': fields.String
+
+    })
     def get(self):
         # // get all reviews
         # // return all reviews
-        rid = parser.parse_args()['id']
-        abort_if_review_doesnt_exist(rid)
-        if rid:
-            stmt = Review.query.filter_by(id=rid)
-            return stmt.one()
+        tid = parser.parse_args()['tid']
+        sid = parser.parse_args()['sid']
+        print(tid, sid)
+        if tid:
+            stmt = (db_session.query(Review.show_id, Review.id, Review.rating, Review.review, User.username,
+                                     User.email).join(User, User.id == Review.user_id)
+                    .where(Review.theatre_id == tid))
+        elif sid:
+            stmt = (db_session.query(Review.id, Review.rating, Review.review, User.username, User.email).join(User,
+                                                                                                              User.id == Review.user_id)
+                    .where(Review.show_id == sid))
+        return stmt.all()
 
     @marshal_with(resource_fields)
     def post(self):
@@ -50,8 +71,9 @@ class ReviewsAPI(Resource):
         # // return review id
         args = parser2.parse_args()
         review = Review(
-            user_id=args['user_id'],
+            user_id=current_user.id,
             show_id=args['show_id'],
+            theatre_id=args['theatre_id'],
             rating=args['rating'],
             review=args['review'])
         db_session.add(review)

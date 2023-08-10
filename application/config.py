@@ -25,15 +25,12 @@ cacheConfig = {
 # }
 
 
-class Config():
+class Config:
     DEBUG = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     WTF_CSRF_ENABLED = False
     SECURITY_TOKEN_AUTHENTICATION_HEADER = "Authentication-Token"
-    GOOGLE_CLIENT_ID = '519706053397-1739mh8juqvrs4tv89mer3dvdjoshl01.apps.googleusercontent.com'
-    GOOGLE_CLIENT_SECRET = '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'
-    GITHUB_CLIENT_ID = 'Iv1.e8d9d28168ffef59'
-    GITHUB_CLIENT_SECRET = '7535a4842dd80137d6c6601275b8b55f3d27ab65'
+
     # Celery Configs
     # CELERY_CONFIG = celeryConfig
     CELERY_BROKER_URL = 'redis://localhost:6379/1'
@@ -45,11 +42,17 @@ class Config():
     SECURITY_PASSWORD_HASH = "bcrypt"
     SECURITY_REGISTERABLE = True  # do not correct spelling
     SECURITY_CONFIRMABLE = False
-    SECURITY_OAUTH_ENABLE = True
     SECURITY_SEND_REGISTER_EMAIL = False
     SECURITY_UNAUTHORIZED_VIEW = None
     SECURITY_TRACKABLE = True
     SECURITY_USERNAME_ENABLE = True
+
+    # Flask-Social configuration
+    SECURITY_OAUTH_ENABLE = True
+    GOOGLE_CLIENT_ID = '519706053397-1739mh8juqvrs4tv89mer3dvdjoshl01.apps.googleusercontent.com'
+    GOOGLE_CLIENT_SECRET = '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'
+    GITHUB_CLIENT_ID = 'Iv1.e8d9d28168ffef59'
+    GITHUB_CLIENT_SECRET = '7535a4842dd80137d6c6601275b8b55f3d27ab65'
 
     # Flask-Mail configuration
     MAIL_SERVER = 'sandbox.smtp.mailtrap.io'
@@ -62,14 +65,15 @@ class Config():
     # SPA
     SECURITY_REDIRECT_BEHAVIOR = "spa"
     SECURITY_FLASH_MESSAGES = False
-    SECURITY_CSRF_PROTECT_MECHANISMS = ["session", "basic"]
+    SECURITY_CSRF_PROTECT_MECHANISMS = ["session", "token"]
     SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS = True
 
     # Send Cookie with csrf-token. This is the default for Axios and Angular.
     SECURITY_CSRF_COOKIE_NAME = "XSRF-TOKEN"
     WTF_CSRF_CHECK_DEFAULT = False
     WTF_CSRF_TIME_LIMIT = None
-    SECURITY_REDIRECT_HOST = 'localhost:8080'
+    SECURITY_REDIRECT_HOST = 'https://localhost:8080/'
+    SECURITY_POST_LOGIN_VIEW = 'https://localhost:8080/'
 
 
 class LocalDevelopmentConfig(Config):

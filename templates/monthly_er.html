@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <title>Entertainment Report</title>
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #121212;
+            color: #ffffff !important;
+        {#font-size: 16px; /* Default font size */#}
+        }
+
+        header {
+            background-color: #222;
+            color: #fff;
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        .welcome {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #1e1e1e;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            margin-top: 2rem;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 1.5rem; /* 32px */
+        }
+
+        p {
+            color: #ccc;
+            line-height: 1.6;
+            font-size: 1rem; /* 16px */
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2em;
+            color: #aaa;
+        }
+
+        section {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2em;
+            background-color: #222;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            margin-top: 2em;
+        }
+
+        h2 {
+            color: #fdd;
+        }
+
+        .movie-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .movie-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1em;
+        }
+
+        .movie-poster {
+            width: 100px;
+            height: 150px;
+            margin-right: 1em;
+        }
+
+        .movie-details {
+            flex: 1;
+            color: #eee;
+        }
+
+        .movie-title {
+            font-weight: bold;
+            color: #eee;
+        }
+
+        .movie-rating {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        .movie-recommendation {
+            margin-top: 2em;
+            text-align: center;
+        }
+
+        button {
+            background-color: #ad2c2c;
+            border: none;
+            color: #fff;
+            padding: 1em 2em;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-bottom: 2em;
+            cursor: pointer;
+        }
+
+        .star-rating {
+            font-size: 24px;
+            color: #FFD700; /* Gold color */
+        }
+    </style>
+</head>
+<body style="background: #1e1e1e!important;">
+<header>
+    <h1 class="h2">Entertainment Report</h1>
+</header>
+
+<section class="welcome">
+    <p>Hi there,</p>
+    <p>We are thrilled to present your personalized monthly entertainment report! </p>
+    <p>In this report, you'll find exciting information about your recent movie bookings, theater reviews, and
+        recommendations for new movies to keep you entertained.</p>
+    <p>Our team has curated the latest and greatest in the world of entertainment, just for you. So sit back, relax, and
+        enjoy this month's highlights!</p>
+    <p>If you have any feedback or suggestions, feel free to reach out to us. We're always here to enhance your
+        entertainment experience.</p>
+    <p>Thank you for being a part of our community!</p>
+    <p>Best regards,</p>
+    <p>The TicketShow Team</p>
+</section>
+<section>
+    <h2>Your Movie Bookings</h2>
+    <ul class="movie-list">
+        {% for m in feed[0] %}
+
+            <li class="movie-item">
+                <img src="{{ m.image_url }}" alt="Movie 1 Poster" class="movie-poster">
+                <div class="movie-details">
+                    <h1 class="movie-title">{{ m.name }}</h1>
+                    <h5 class="movie-details">{{ m.director }}</h5>
+                    <p>Booking Date: {{ m.date }} | {{ m.start }} - {{ m.end }}<br>
+                        Total Price: {{ m.total_price }}</p>
+                </div>
+            </li>
+        {% endfor %}
+
+    </ul>
+</section>
+<section>
+    <h2>Your Reviews</h2>
+    <p>Here are your some recent reviews:</p>
+    <hr>
+    {% for r in feed[1] %}
+
+        <h1 class="movie-title">{{ r.name }}</h1>
+        <div class="container ">
+            <div class="star-rating">
+                {% for x in range(r.rating) %}
+                    <i class="fas fa-star"></i>
+                {% endfor %}
+                {% for x in range(5-r.rating) %}
+                    <i class="far fa-star"></i>
+                {% endfor %}
+            </div>
+        </div>
+        <p> {{ r.review }}</p>
+        <hr>
+    {% endfor %}
+</section>
+<section style="display: none">
+    <h2>Recommended New Movies</h2>
+    <div class="movie-recommendation">
+        <p>We have some exciting new movie recommendations for you:</p>
+        <img src="recommended_movie1.jpg" alt="Recommended Movie 1">
+        <img src="recommended_movie2.jpg" alt="Recommended Movie 2">
+    </div>
+
+</section>
+<footer class="footer">
+    <p>For more entertainment updates, visit our website!</p>
+    <button href="localhost:8080">Visit TicketShow</button>
+</footer>
+</body>
+</html>

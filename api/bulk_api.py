@@ -1,6 +1,10 @@
-from flask import request
+import json
+from io import BytesIO
+
+from flask import request, Response
 from flask_restful import Resource, reqparse
 from flask_security import current_user, auth_required
+from werkzeug.wsgi import FileWrapper
 
 from application.database import db_session, get_or_create
 from application.models import Show, Theatre, Running
@@ -57,7 +61,7 @@ class BulkRunningApi(Resource):
                 .where(Theatre.user_id == current_user.id).all())
         return [x.as_dict() for x in stmt]
 
-    def post():
+    def post(self):
         try:
             json = request.get_json(force=True)
             for args in json:
@@ -67,3 +71,73 @@ class BulkRunningApi(Resource):
         except Exception as e:
             db_session.rollback()
             return {'error': str(e)}, 400
+
+
+class ExportCSV(Resource):
+    def get(self):
+        # api = parser.parse_args()['api']
+        print(12)
+        # if api == 'shows':
+        stmt = db_session.query(Show).where(Show.user_id == current_user.id).all()
+        log = [x.as_dict() for x in stmt]
+        # print(data)
+
+        # def generate():
+        #     data = StringIO()
+        #     w = csv.writer(data)
+        #
+        #     # write header
+        #     w.writerow((
+        #         'id',
+        #         'name',
+        #         'image_url',
+        #         'image_sqr',
+        #         'tags',
+        #         'ticket_price',
+        #         'format',
+        #         'language',
+        #         'director',
+        #         'description',
+        #         'rating',
+        #         'year',
+        #         'duration',
+        #         'user_id',
+        #         'timestamp'
+        #     ))
+        #     yield data.getvalue()
+        #     data.seek(0)
+        #     data.truncate(0)
+        #
+        #     # write each log item
+        #     for item in log:
+        #         w.writerow((
+        #             item['id'],
+        #                 item['name'],
+        #                 item['image_url'],
+        #                 item['image_sqr'],
+        #                 item['tags'],
+        #                 item['ticket_price'],
+        #                 item['format'],
+        #                 item['language'],
+        #                 item['director'],
+        #                 item['description'],
+        #                 item['rating'],
+        #                 item['year'],
+        #                 item['duration'],
+        #                 item['user_id'],
+        #                 item['timestamp']
+        #                 # format datetime as string
+        #             ))
+        #             yield data.getvalue()
+        #             data.seek(0)
+        #             data.truncate(0)
+        #
+        #     response = Response(generate(), mimetype='text/csv')
+        #     # add a filename
+        #     response.headers.set("Content-Disposition", "attachment", filename="export.csv")
+        #     return response
+        #
+        # def get2(self):
+        b = FileWrapper(BytesIO(json.dumps(log, indent=4).encode('utf-8')))
+        header = {'Content-Disposition': 'attachment; filename="credentials.json"'}
+        return Response(b, mimetype="text/plain", direct_passthrough=True, headers=header)

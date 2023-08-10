@@ -1,3 +1,5 @@
+import datetime
+
 from flask_security import UserMixin, RoleMixin
 from sqlalchemy import Boolean, DateTime, Column, Integer, String, ForeignKey, UnicodeText, Float
 from sqlalchemy.orm import relationship, backref
@@ -54,6 +56,7 @@ class Theatre(Base):
     user_id = Column(Integer, ForeignKey("user.id"))
     rating = Column(Integer)
     city = Column(String(255))
+    timestamp = Column(DateTime(), default=datetime.datetime.utcnow())
 
     def as_dict(self):
         return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
@@ -75,6 +78,8 @@ class Show(Base):
     format = Column(String(255), nullable=False)
     language = Column(String(255), nullable=False)
     user_id = Column(Integer, ForeignKey("user.id"))
+    timestamp = Column(DateTime(), default=datetime.datetime.utcnow())
+
 
     def as_dict(self):
         return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
@@ -92,6 +97,8 @@ class Running(Base):
     ticket_price = Column(Float())
     format = Column(String(255), nullable=False)
     occupied_seats = Column(String(255), nullable=True)
+    timestamp = Column(DateTime(), default=datetime.datetime.utcnow())
+
 
     def as_dict(self):
         return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
@@ -112,6 +119,7 @@ class Booking(Base):
     language = Column(String(255), nullable=False)
     format = Column(String(255), nullable=False)
     date = Column(String(255))
+    timestamp = Column(DateTime(), default=datetime.datetime.utcnow())
 
     def as_dict(self):
         return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
@@ -125,17 +133,7 @@ class Review(Base):
     theatre_id = Column(Integer, ForeignKey("theatre.id"))
     rating = Column(Integer)
     review = Column(String(255))
-
-    def as_dict(self):
-        return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
-
-
-class UserReview(Base):
-    __tablename__ = "user_review"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("user.id"))
-    review_id = Column(Integer, ForeignKey("review.id"))
-    like = Column(Boolean)
+    timestamp = Column(DateTime(), default=datetime.datetime.utcnow())
 
     def as_dict(self):
         return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}

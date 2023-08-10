@@ -52,7 +52,7 @@ class SearchAPI(Resource):
         search_type = request.args.get('search_type')
         print(search_type, search_string)
         if search_type == '0':
-            stmt = db_session.query(Show.name, Show.director).filter(
+            stmt = db_session.query(Show.id, Show.name, Show.director).filter(
                 or_(
                     Show.name.like('%' + search_string + '%'),
                     Show.director.like('%' + search_string + '%'),
