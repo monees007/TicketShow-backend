@@ -53,9 +53,8 @@ def t_revenue_collected(tid):
     for x in range(1, 16):
         end = datetime.utcnow() - timedelta(days=x)
         start = end - timedelta(days=1)
-        rev = (db_session.query(Booking.total_price).join(Theatre, Booking.theatre_name == Theatre.name)
-               .where(Theatre.id == tid).filter(
-            and_(end > Booking.timestamp, Booking.timestamp > start)).all())
+        rev = (db_session.query(Booking.total_price).join(Theatre, Booking.theatre_name == Theatre.name).where(
+            Theatre.id == tid).filter(and_(end > Booking.timestamp, Booking.timestamp > start)).all())
         rev = marshal(rev, {'total_price': fields.Float})
         rev = sum([x['total_price'] for x in rev])
         result.append(rev)
@@ -69,9 +68,8 @@ def t_ticket_sold(tid):
         seats_count = 0
         end = datetime.utcnow() - timedelta(days=x)
         start = end - timedelta(days=1)
-        rev = (db_session.query(Booking.seats).join(Theatre, Booking.theatre_name == Theatre.name)
-               .where(Theatre.id == tid).filter(
-            and_(end > Booking.timestamp, Booking.timestamp > start)).all())
+        rev = (db_session.query(Booking.seats).join(Theatre, Booking.theatre_name == Theatre.name).where(
+            Theatre.id == tid).filter(and_(end > Booking.timestamp, Booking.timestamp > start)).all())
         seats = marshal(rev, {'seats': fields.String})
         for p in seats:
             for y in p['seats'].split(','):
@@ -99,29 +97,28 @@ def t_rating(tid):
         rating_all.append(rating_sum / rating_c if rating_c != 0 else 0)
 
 
-# def top_charts():
-#     theatre= db_session.query(Theatre)
+def combine_rating(L):
+    """
+    take a list of rating and combines them
+    :param L: List of rating
+    :return: Integer
+    """
+    sum = 0
+    for x in L:
+        sum += int(x)
+    return sum // len(L) if len(L) != 0 else 0
 
 
 def monthly_er(email):
     uid = db_session.query(User.id).where(User.email == email).first()[0].__str__()
     books = marshal(
         db_session.query(Booking.total_price, Booking.date, Booking.start, Booking.end, Show.name, Show.image_url,
-                         Show.director).join(Show, Booking.show_name == Show.name).where(
-            Booking.user_id == uid).all(), {'image_url': fields.String,
-                                            'total_price': fields.Float,
-                                            'date': fields.String,
-                                            'start': fields.String,
-                                            'end': fields.String,
-                                            'name': fields.String,
-                                            'director': fields.String,
-                                            })
+                         Show.director).join(Show, Booking.show_name == Show.name).where(Booking.user_id == uid).all(),
+        {'image_url': fields.String, 'total_price': fields.Float, 'date': fields.String, 'start': fields.String,
+         'end': fields.String, 'name': fields.String, 'director': fields.String, })
     reviews = marshal(
         db_session.query(Review.rating, Review.review, Show.name).join(Show, Show.id == Review.show_id).where(
             Review.user_id == uid).order_by(Review.show_id, Review.theatre_id).all(),
-        {'rating': fields.Integer,
-         'review': fields.String,
-         'name': fields.String,
-         })
+        {'rating': fields.Integer, 'review': fields.String, 'name': fields.String, })
     # ToDo: Add recommendations
     return [books, reviews]

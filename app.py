@@ -1,12 +1,13 @@
 import os
 from datetime import datetime, timedelta
 
+import sqlalchemy
 from authlib.integrations.flask_client import OAuth
 from celery.schedules import crontab
 from flask import Flask, render_template
 from flask_cors import CORS
 from flask_mailman import Mail, EmailMessage
-from flask_restful import Api
+from flask_restful import Api, marshal, fields
 from flask_security import Security, hash_password, SQLAlchemySessionUserDatastore
 from sqlalchemy import or_
 
@@ -25,7 +26,7 @@ from application import swagger_render
 from application import workers
 from application.config import LocalDevelopmentConfig
 from application.database import db_session, init_db
-from application.models import User, Role, Booking
+from application.models import User, Role, Booking, Running, Review, Show, Theatre
 
 # render openAPI
 swagger_render.render()
@@ -83,6 +84,8 @@ api.add_resource(ExportCSV, '/api/export')
 @celery.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(crontab(hour='24'), send_reminders.s())
+    sender.add_periodic_task(crontab(hour='24'), dynamic_pricing.s())
+    sender.add_periodic_task(crontab(hour='1'), calculate_ratings.s())
     sender.add_periodic_task(crontab(day_of_month='1'), monthly_er.s())
 
 
@@ -121,14 +124,59 @@ def monthly_er(*args, **kwargs):
             email1.send()
 
 
+@celery.task
+# @cache.cached(timeout=60 * 60 * 24, key_prefix='top_3')
+def dynamic_pricing(*args, **kwargs):
+    """
+    increase the price of top three shows in number of bookings by 30%, 20% and 10%
+    :return: top three shows
+    """
+    running = db_session.query(Booking.running_id, sqlalchemy.func.sum(Booking.person).label('tickets')).group_by(
+        Booking.running_id).all()
+    running = sorted(running, key=lambda x: x[1], reverse=True)
+    running = marshal(running, {'running_id': fields.Integer, 'tickets': fields.Integer})
+    db_session.query(Running).filter(Running.id == running[0]['running_id']).update(
+        {'ticket_price': Running.ticket_price * 1.3})
+    db_session.query(Running).filter(Running.id == running[1]['running_id']).update(
+        {'ticket_price': Running.ticket_price * 1.2})
+    db_session.query(Running).filter(Running.id == running[2]['running_id']).update(
+        {'ticket_price': Running.ticket_price * 1.1})
+    db_session.commit()
+    return running[0:4]
+
+
+@celery.task
+def calculate_ratings(*args, **kwargs):
+    from application.stats import combine_rating
+    s, t = {}, {}
+    raw = [x.as_dict() for x in db_session.query(Review).all()]
+    for x in raw:
+        if x['show_id'] != -1:
+            if x['show_id'] in s.keys():
+                s[x['show_id']].append(x['rating'])
+            else:
+                s[x['show_id']] = [x['rating']]
+        if x['theatre_id'] != -1:
+            if x['theatre_id'] in t.keys():
+                t[x['theatre_id']].append(x['rating'])
+            else:
+                t[x['theatre_id']] = [x['rating']]
+    for y in s.keys():  # y is show_id
+        db_session.query(Show).filter(Show.id == y).update({'rating': combine_rating(s[y])})
+    for y in t.keys():  # y is theatre_id
+        th = db_session.query(Theatre).filter(Theatre.id == y).update({'rating': combine_rating(t[y])})
+    db_session.commit()
+
+
 @app.route("/")
 def home():
     return render_template("swagger.html")
 
 
-@app.route("/test")
+@app.route("/ping")
 def test():
-    return "Hello World"
+    # return application.stats.dynamic_pricing()
+    return 200, 'Hello world'
 
 
 if __name__ == '__main__':

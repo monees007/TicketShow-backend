@@ -109,6 +109,7 @@ class Booking(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("user.id"))
     running_id = Column(Integer, ForeignKey("running.id"))
+    person = Column(Integer)
     seats = Column(String(255))
     total_price = Column(Float())
     theatre_name = Column(String(255))
