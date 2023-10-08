@@ -59,9 +59,11 @@ class RunningAPI(Resource):
         if tid and sid:
             abort_if_show_doesnt_exist(sid)
             stmt = Running.query.filter_by(theatre_id=tid, show_id=sid).all()
+            return [x.as_dict() for x in stmt]
+
         if tid:
             stmt2 = Running.query.filter_by(theatre_id=tid).all()
-        return [x.as_dict() for x in stmt2]
+            return [x.as_dict() for x in stmt2]
 
     @marshal_with(resource_fields)
     def post(self):
