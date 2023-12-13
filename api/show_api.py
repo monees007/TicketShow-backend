@@ -33,9 +33,9 @@ parser3 = parser2.copy()
 parser3.add_argument('id', required=True, type=int)
 
 resource_fields = {
-    'id': fields.Integer,
+    'id': fields.String,
     'name': fields.String,
-    'rating': fields.Integer,
+    'rating': fields.String,
     'image_url': fields.String,
     'image_sqr': fields.String,
     'year': fields.String,
