@@ -12,3 +12,4 @@ Requests
 Flask_Caching
 bleach
 celery[redis]
+bcrypt
