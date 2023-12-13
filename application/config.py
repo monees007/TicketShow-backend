@@ -8,7 +8,7 @@ cacheConfig = {
     'CACHE_REDIS_HOST': "localhost",
     'CACHE_REDIS_PORT': 6379,
     'CACHE_REDIS_DB': 0,
-    'CACHE_REDIS_URL': "redis://localhost:6379/0",
+    'CACHE_REDIS_URL': "redis://red-clss4ttcm5oc73bb1a90:6379/0",
     'CACHE_DEFAULT_TIMEOUT': 500,
     'task_track_started': True
 }
@@ -23,8 +23,8 @@ class Config:
     # Celery Configs
     # CELERY_CONFIG = celeryConfig
     CELERY = dict(
-        broker_url='redis://localhost:6379/1',
-        result_backend='redis://localhost:6379/2'
+        broker_url='redis://red-clss4ttcm5oc73bb1a90:6379/1',
+        result_backend='redis://red-clss4ttcm5oc73bb1a90:6379/2'
     ),
     SQLITE_DB_DIR = os.path.join(basedir, "../database")
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(SQLITE_DB_DIR, "db.sqlite3")
