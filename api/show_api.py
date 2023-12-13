@@ -1,4 +1,5 @@
 from flask_restful import Resource, reqparse, abort, marshal_with, fields
+from flask_security import current_user
 from sqlalchemy.exc import NoResultFound
 
 from application.database import db_session, get_or_create
@@ -27,7 +28,7 @@ parser2.add_argument('tags', required=False, type=str)
 parser2.add_argument('ticket_price', required=False, type=str)
 parser2.add_argument('format', required=False, type=str)
 parser2.add_argument('language', required=False, type=str)
-
+# parser2.add_argument('timestamp',required=False,type=datetime)
 parser3 = parser2.copy()
 parser3.add_argument('id', required=True, type=int)
 
@@ -53,6 +54,7 @@ resource_fields = {
 class ShowsAPI(Resource):
     @marshal_with(resource_fields)
     def get(self):
+
         # // get all shows
         # // return all shows
         sid = parser.parse_args()['id']
@@ -77,7 +79,8 @@ class ShowsAPI(Resource):
                              tags=args['tags'],
                              ticket_price=args['ticket_price'],
                              format=args['format'],
-                             language=args['language'])
+                             language=args['language'],
+                             user_id=current_user.id)
         db_session.commit()
         return show
 
@@ -94,15 +97,18 @@ class ShowsAPI(Resource):
 
     @marshal_with(resource_fields)
     def put(self):
+        print(1789)
         # // update show in database
         # // return show id
         args = parser3.parse_args()
+        print('args:', args)
         # for x in args:
         #     print(x,args[x])
         abort_if_show_doesnt_exist(args['id'])
-        show = db_session.query(Show).filter_by(id=args['id'])
-        print(show, '\n', args)
+        show = Show.query.filter_by(id=args['id'])
+
+        print('before:', show.one().as_dict())
         show.update(args)
-        print(show)
+        print('after:', show.one().as_dict())
         db_session.commit()
         return show.one()

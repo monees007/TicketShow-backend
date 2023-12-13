@@ -78,7 +78,7 @@ class Show(Base):
     format = Column(String(255), nullable=False)
     language = Column(String(255), nullable=False)
     user_id = Column(Integer, ForeignKey("user.id"))
-    timestamp = Column(DateTime(), default=datetime.datetime.utcnow())
+    timestamp = Column(DateTime(), default=datetime.datetime.utcnow(), nullable=True)
 
 
     def as_dict(self):
@@ -120,7 +120,7 @@ class Booking(Base):
     language = Column(String(255), nullable=False)
     format = Column(String(255), nullable=False)
     date = Column(String(255))
-    timestamp = Column(DateTime(), default=datetime.datetime.utcnow())
+    timestamp = Column(DateTime(), default=datetime.datetime.utcnow() - datetime.timedelta(days=7))
 
     def as_dict(self):
         return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}

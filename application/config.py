@@ -10,19 +10,8 @@ cacheConfig = {
     'CACHE_REDIS_DB': 0,
     'CACHE_REDIS_URL': "redis://localhost:6379/0",
     'CACHE_DEFAULT_TIMEOUT': 500,
+    'task_track_started': True
 }
-
-
-# celeryConfig = {
-#     "broker_url": "redis://redis",
-#     "result_backend": "redis://redis",
-#     "beat_schedule": {
-#         "reminder_email": {
-#             "task": "app.send_flask_mail",
-#             "schedule": 10,
-#         }
-#     }
-# }
 
 
 class Config:
@@ -33,8 +22,10 @@ class Config:
 
     # Celery Configs
     # CELERY_CONFIG = celeryConfig
-    CELERY_BROKER_URL = 'redis://localhost:6379/1'
-    CELERY_RESULT_BACKEND = 'redis://localhost:6379/2'
+    CELERY = dict(
+        broker_url='redis://localhost:6379/1',
+        result_backend='redis://localhost:6379/2'
+    ),
     SQLITE_DB_DIR = os.path.join(basedir, "../database")
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(SQLITE_DB_DIR, "db.sqlite3")
 

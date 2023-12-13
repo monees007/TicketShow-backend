@@ -3,13 +3,12 @@ from flask_restful import Resource, marshal
 from sqlalchemy import desc, or_
 
 from api import show_api, theater_api
-from application import cache
 from application.database import db_session
 from application.models import Running, Theatre, Show
 
 
 class HomePageAPI(Resource):
-    @cache.cached(timeout=50)
+    # @cache.cached(timeout=50)
     def get(self):
         """
         datastructure of return:
@@ -18,11 +17,13 @@ class HomePageAPI(Resource):
           t_order // order of theatres in dec order of rating
         ]
         """
+        city = request.args.get('city')
         appendage = [{}]
         t_order = []
         theater_ids = (
-            db_session.query(Running.theatre_id).join(Theatre, Running.theatre_id == Theatre.id).order_by(
-                desc(Theatre.rating)).all())
+            db_session.query(Running.theatre_id).join(Theatre, Running.theatre_id == Theatre.id).where(
+                Theatre.city == city).order_by(
+                desc(Running.timestamp)).all())
         for x in theater_ids:
             tid = x[0]
             if tid not in t_order:

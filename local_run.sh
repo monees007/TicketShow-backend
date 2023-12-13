@@ -13,8 +13,8 @@ else
 fi
 
 # Activate local workers
-redis-server
-celery -A app.celery worker --loglevel=info
+#redis-server
+#celery -A app.celery worker --loglevel=info
 
 # Activate virtual env
 . venv/bin/activate
