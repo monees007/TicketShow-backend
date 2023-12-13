@@ -40,16 +40,16 @@ class Config:
 
     # Flask-Social configuration
     SECURITY_OAUTH_ENABLE = True
-    GOOGLE_CLIENT_ID = '519706053397-1739mh8juqvrs4tv89mer3dvdjoshl01.apps.googleusercontent.com'
-    GOOGLE_CLIENT_SECRET = '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'
-    GITHUB_CLIENT_ID = 'Iv1.e8d9d28168ffef59'
-    GITHUB_CLIENT_SECRET = '7535a4842dd80137d6c6601275b8b55f3d27ab65'
+    GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '')
+    GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET', '')
+    GITHUB_CLIENT_ID = os.getenv('GITHUB_CLIENT_ID', '')
+    GITHUB_CLIENT_SECRET = os.getenv('GITHUB_CLIENT_SECRET', '')
 
     # Flask-Mail configuration
     MAIL_SERVER = 'sandbox.smtp.mailtrap.io'
     MAIL_PORT = 2525
-    MAIL_USERNAME = 'f3cc19503b3edc'
-    MAIL_PASSWORD = '8763655e4bc55d'
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME', '')
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', '')
     MAIL_USE_TLS = True
     MAIL_USE_SSL = False
 
@@ -69,5 +69,5 @@ class Config:
 
 class LocalDevelopmentConfig(Config):
     DEBUG = True
-    SECRET_KEY = os.environ.get("SECRET_KEY", 'pf9Wkove4IKEAXvy-cQkeDPhv9Cb3Ag-wyJILbq_dFw')
-    SECURITY_PASSWORD_SALT = 'secrets.SystemRandom().getrandbits(128)'
+    SECRET_KEY = os.environ.get("SECRET_KEY", '')
+    SECURITY_PASSWORD_SALT = os.environ.get("SECURITY_PASSWORD_SALT", '')
